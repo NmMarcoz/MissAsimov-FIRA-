@@ -68,8 +68,7 @@ void giroDireita(int velo){
   Serial.println("Girando girandooo (pra direita");
   while(distanceD > 5){
     distanceD = ultraD.Ranging(CM); 
-    motors.setSpeedLeft(velo);
-    motors.setSpeedRight(velo *-1);
+    moveTank(70, -70);
   }
   Serial.println("Giro finalizado");
   lastCurve = "DIREITA";
@@ -82,12 +81,16 @@ void giroEsquerda(int velo){
   Serial.println("Girando girandooo (pra esquerda");
   while(distanceE > 5){
     distanceE = ultraD.Ranging(CM);
-    motors.setSpeedLeft(velo*-1);
-    motors.setSpeedRight(velo);
+    moveTank(-70, 70);
   }
   Serial.println("Giro finalizado");
   lastCurve = "ESQUERDA";
   delay(400);
+}
+
+void moveTank(int velocidade_esquerda, int velocidade_direita){
+  motors.setSpeedLeft(velocidade_esquerda);
+  motors.setSpeedRight(velocidade_direita);
 }
 
 void pid(){
@@ -97,7 +100,7 @@ void pid(){
   }else{
       Serial.println("Distância muito grande para o PID!");
       Serial.println("Ativando modo de uma parede rs");
-      if(lastCurve == "DIREITA"){
+      if(lastCurve == "DIREITA"){ //Falta a lógica pra seguir apenas uma parede aqui rs
         Serial.println("\n\n\n\n\n\n\n");
         Serial.println("Tenho que seguir apenas a parede da esquerda!");
       }else if(lastCurve == "ESQUERDA"){
@@ -110,7 +113,7 @@ void pid(){
 void proporcional(){
   erroD = (100 - distanceD);
   erroE = (100 - distanceE);
-  sub = (int)(fabs((erroE - erroD))*KP);
+  sub = (int)  (fabs(100 - ((erroE - erroD))*KP));
 
   if(distanceE > distanceD){
     Serial.println("Proporcional para esquerda");
